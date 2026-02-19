@@ -39,4 +39,185 @@ canvas {
 .counter {
   margin-top: 20px;
   font-size: 18px;
-  letter-
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* FOTO */
+.photo {
+  margin-top: 30px;
+  width: 170px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 30px rgba(255,255,255,0.5);
+  animation: fadeIn 4s forwards;
+  animation-delay: 2s;
+}
+
+.reflection {
+  margin-top: 40px;
+  opacity: 0;
+  animation: fadeIn 4s forwards;
+  animation-delay: 4s;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="sky"></canvas>
+
+<div class="content">
+
+  <div class="poem">
+    Han pasado:
+  </div>
+
+  <div class="counter" id="counter"></div>
+
+  <img src="Val.jpeg" class="photo">
+
+  <div class="poem reflection">
+    Desde entonces,<br>
+    el tiempo tiene otro ritmo.<br><br>
+    Sin ruido.<br>
+    Pero real.<br><br>
+    Y me gusta.<br><br>
+    Quiero que todo siga siendo así.
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("sky");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// ⭐ Estrellas
+let stars = [];
+for (let i = 0; i < 140; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 2 + 0.5,
+    alpha: Math.random(),
+    speed: Math.random() * 0.015
+  });
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let star of stars) {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = "white";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    star.alpha += star.speed;
+    if (star.alpha <= 0.2 || star.alpha >= 1) {
+      star.speed = -star.speed;
+    }
+  }
+
+  drawShootingStar();
+  requestAnimationFrame(drawStars);
+}
+
+// 🌠 Estrella fugaz
+let shootingStar = null;
+
+function createShootingStar() {
+  shootingStar = {
+    x: Math.random() * canvas.width * 0.6,
+    y: Math.random() * canvas.height * 0.4,
+    vx: 8,
+    vy: 3,
+    size: 3,
+    life: 0,
+    maxLife: 40
+  };
+}
+
+function drawShootingStar() {
+  if (!shootingStar && Math.random() < 0.003) {
+    createShootingStar();
+  }
+
+  if (shootingStar) {
+
+    const gradient = ctx.createLinearGradient(
+      shootingStar.x,
+      shootingStar.y,
+      shootingStar.x - 80,
+      shootingStar.y - 30
+    );
+
+    gradient.addColorStop(0, "rgba(255,255,255,1)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(shootingStar.x, shootingStar.y);
+    ctx.lineTo(
+      shootingStar.x - 80,
+      shootingStar.y - 30
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(shootingStar.x, shootingStar.y, shootingStar.size, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "white";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    shootingStar.x += shootingStar.vx;
+    shootingStar.y += shootingStar.vy;
+    shootingStar.life++;
+
+    if (shootingStar.life > shootingStar.maxLife) {
+      shootingStar = null;
+    }
+  }
+}
+
+drawStars();
+
+// ⏳ Contador
+const startDate = new Date("2025-10-16T18:00:00");
+
+function updateCounter() {
+  const now = new Date();
+  const diff = now - startDate;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  document.getElementById("counter").innerHTML =
+    days + " días · " +
+    hours + " horas · " +
+    minutes + " minutos · " +
+    seconds + " segundos";
+}
+
+setInterval(updateCounter, 1000);
+updateCounter();
+</script>
+
+</body>
+</html>
