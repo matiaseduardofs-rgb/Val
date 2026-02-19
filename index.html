@@ -85,6 +85,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// ⭐ Estrellas
 let stars = [];
 for (let i = 0; i < 140; i++) {
   stars.push({
@@ -118,42 +119,64 @@ function drawStars() {
   requestAnimationFrame(drawStars);
 }
 
+// 🌠 Estrella fugaz mejorada
 let shootingStar = null;
 
 function createShootingStar() {
   shootingStar = {
-    x: Math.random() * canvas.width * 0.7,
+    x: Math.random() * canvas.width * 0.6,
     y: Math.random() * canvas.height * 0.4,
-    length: 150,
-    speed: 8,
-    life: 0
+    vx: 8,
+    vy: 3,
+    size: 3,
+    life: 0,
+    maxLife: 40
   };
 }
 
 function drawShootingStar() {
-  if (!shootingStar && Math.random() < 0.004) {
+  if (!shootingStar && Math.random() < 0.003) {
     createShootingStar();
   }
 
   if (shootingStar) {
+
+    // Cola degradada
+    const gradient = ctx.createLinearGradient(
+      shootingStar.x,
+      shootingStar.y,
+      shootingStar.x - 80,
+      shootingStar.y - 30
+    );
+
+    gradient.addColorStop(0, "rgba(255,255,255,1)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(shootingStar.x, shootingStar.y);
     ctx.lineTo(
-      shootingStar.x - shootingStar.length,
-      shootingStar.y + shootingStar.length * 0.4
+      shootingStar.x - 80,
+      shootingStar.y - 30
     );
-    ctx.strokeStyle = "rgba(255,255,255,0.85)";
-    ctx.lineWidth = 2;
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = "white";
     ctx.stroke();
+
+    // Cabeza brillante
+    ctx.beginPath();
+    ctx.arc(shootingStar.x, shootingStar.y, shootingStar.size, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "white";
+    ctx.fill();
     ctx.shadowBlur = 0;
 
-    shootingStar.x += shootingStar.speed;
-    shootingStar.y += shootingStar.speed * 0.4;
+    // Movimiento
+    shootingStar.x += shootingStar.vx;
+    shootingStar.y += shootingStar.vy;
     shootingStar.life++;
 
-    if (shootingStar.life > 20) {
+    if (shootingStar.life > shootingStar.maxLife) {
       shootingStar = null;
     }
   }
@@ -161,7 +184,7 @@ function drawShootingStar() {
 
 drawStars();
 
-// Contador
+// ⏳ Contador
 const startDate = new Date("2025-10-16T18:00:00");
 
 function updateCounter() {
@@ -186,3 +209,4 @@ updateCounter();
 
 </body>
 </html>
+
