@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>✨</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(ellipse at bottom, #0b132b 0%, #000000 100%);
+  overflow: hidden;
+  font-family: 'Georgia', serif;
+  color: white;
+  text-align: center;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  top: 28vh;
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.poem {
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeIn 4s forwards;
+}
+
+.counter {
+  margin-top: 40px;
+  font-size: 16px;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="sky"></canvas>
+
+<div class="content">
+  <div class="poem">
+    Desde aquel 16 de octubre,<br>
+    algo en mí sonríe distinto.<br><br>
+    No es prisa.<br>
+    No es ruido.<br>
+    Es simplemente bonito.
+  </div>
+
+  <div class="counter" id="counter"></div>
+</div>
+
+<script>
+const canvas = document.getElementById("sky");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+for (let i = 0; i < 120; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 1.5,
+    alpha: Math.random(),
+    speed: Math.random() * 0.02
+  });
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let star of stars) {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+    ctx.fill();
+    star.alpha += star.speed;
+    if (star.alpha <= 0 || star.alpha >= 1) {
+      star.speed = -star.speed;
+    }
+  }
+
+  drawShootingStar();
+  requestAnimationFrame(drawStars);
+}
+
+let shootingStar = null;
+
+function createShootingStar() {
+  shootingStar = {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height / 2,
+    length: 300,
+    speed: 6,
+    opacity: 1
+  };
+}
+
+function drawShootingStar() {
+  if (!shootingStar && Math.random() < 0.003) {
+    createShootingStar();
+  }
+
+  if (shootingStar) {
+    ctx.beginPath();
+    ctx.moveTo(shootingStar.x, shootingStar.y);
+    ctx.lineTo(shootingStar.x - shootingStar.length, shootingStar.y + shootingStar.length * 0.3);
+    ctx.strokeStyle = `rgba(255,255,255,${shootingStar.opacity})`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    shootingStar.x += shootingStar.speed;
+    shootingStar.y += shootingStar.speed * 0.3;
+    shootingStar.opacity -= 0.01;
+
+    if (shootingStar.opacity <= 0) {
+      shootingStar = null;
+    }
+  }
+}
+
+drawStars();
+
+// ⏳ Contador
+const startDate = new Date("2025-10-16T18:00:00");
+
+function updateCounter() {
+  const now = new Date();
+  const diff = now - startDate;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  document.getElementById("counter").innerHTML =
+    days + " días · " +
+    hours + " horas · " +
+    minutes + " minutos · " +
+    seconds + " segundos";
+}
+
+setInterval(updateCounter, 1000);
+updateCounter();
+</script>
+
+</body>
+</html>
