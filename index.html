@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>✨</title>
+
 <style>
 body {
   margin: 0;
@@ -23,7 +24,7 @@ canvas {
 .content {
   position: relative;
   z-index: 2;
-  top: 28vh;
+  top: 25vh;
   max-width: 600px;
   margin: auto;
   padding: 20px;
@@ -33,15 +34,20 @@ canvas {
   font-size: 22px;
   font-weight: 300;
   line-height: 1.6;
-  opacity: 0;
-  animation: fadeIn 4s forwards;
 }
 
 .counter {
-  margin-top: 40px;
-  font-size: 16px;
+  margin-top: 20px;
+  font-size: 18px;
   letter-spacing: 1px;
-  opacity: 0.8;
+  opacity: 0.9;
+}
+
+.reflection {
+  margin-top: 40px;
+  opacity: 0;
+  animation: fadeIn 4s forwards;
+  animation-delay: 3s;
 }
 
 @keyframes fadeIn {
@@ -49,20 +55,28 @@ canvas {
 }
 </style>
 </head>
+
 <body>
 
 <canvas id="sky"></canvas>
 
 <div class="content">
+
   <div class="poem">
-    Desde aquel 16 de octubre,<br>
-    algo en mí sonríe distinto.<br><br>
-    No es prisa.<br>
-    No es ruido.<br>
-    Es simplemente bonito.
+    Han pasado:
   </div>
 
   <div class="counter" id="counter"></div>
+
+  <div class="poem reflection">
+    Desde entonces,<br>
+    el tiempo tiene otro ritmo.<br><br>
+    Sin ruido.<br>
+    Pero real.<br><br>
+    Y me gusta.<br><br>
+    Quiero que todo siga siendo así.
+  </div>
+
 </div>
 
 <script>
@@ -72,13 +86,13 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let stars = [];
-for (let i = 0; i < 120; i++) {
+for (let i = 0; i < 140; i++) {
   stars.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    radius: Math.random() * 1.5,
+    radius: Math.random() * 2 + 0.5,
     alpha: Math.random(),
-    speed: Math.random() * 0.02
+    speed: Math.random() * 0.015
   });
 }
 
@@ -89,9 +103,13 @@ function drawStars() {
     ctx.beginPath();
     ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = "white";
     ctx.fill();
+    ctx.shadowBlur = 0;
+
     star.alpha += star.speed;
-    if (star.alpha <= 0 || star.alpha >= 1) {
+    if (star.alpha <= 0.2 || star.alpha >= 1) {
       star.speed = -star.speed;
     }
   }
@@ -104,32 +122,38 @@ let shootingStar = null;
 
 function createShootingStar() {
   shootingStar = {
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height / 2,
-    length: 300,
-    speed: 6,
-    opacity: 1
+    x: Math.random() * canvas.width * 0.7,
+    y: Math.random() * canvas.height * 0.4,
+    length: 150,
+    speed: 8,
+    life: 0
   };
 }
 
 function drawShootingStar() {
-  if (!shootingStar && Math.random() < 0.003) {
+  if (!shootingStar && Math.random() < 0.004) {
     createShootingStar();
   }
 
   if (shootingStar) {
     ctx.beginPath();
     ctx.moveTo(shootingStar.x, shootingStar.y);
-    ctx.lineTo(shootingStar.x - shootingStar.length, shootingStar.y + shootingStar.length * 0.3);
-    ctx.strokeStyle = `rgba(255,255,255,${shootingStar.opacity})`;
+    ctx.lineTo(
+      shootingStar.x - shootingStar.length,
+      shootingStar.y + shootingStar.length * 0.4
+    );
+    ctx.strokeStyle = "rgba(255,255,255,0.85)";
     ctx.lineWidth = 2;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "white";
     ctx.stroke();
+    ctx.shadowBlur = 0;
 
     shootingStar.x += shootingStar.speed;
-    shootingStar.y += shootingStar.speed * 0.3;
-    shootingStar.opacity -= 0.01;
+    shootingStar.y += shootingStar.speed * 0.4;
+    shootingStar.life++;
 
-    if (shootingStar.opacity <= 0) {
+    if (shootingStar.life > 20) {
       shootingStar = null;
     }
   }
@@ -137,7 +161,7 @@ function drawShootingStar() {
 
 drawStars();
 
-// ⏳ Contador
+// Contador
 const startDate = new Date("2025-10-16T18:00:00");
 
 function updateCounter() {
