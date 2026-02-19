@@ -8,86 +8,86 @@
 <style>
 body {
     margin: 0;
-    padding: 0;
     background: radial-gradient(ellipse at bottom, #0b0f2a 0%, #000 100%);
     overflow: hidden;
     font-family: 'Segoe UI', sans-serif;
     color: white;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Subimos el contenido */
-    min-height: 100vh;
-    padding-top: 8vh; /* Ajusta este valor si lo quieres más arriba */
     text-align: center;
 }
 
-/* Contenedor principal */
+/* CONTENEDOR */
 .container {
+    position: relative;
     z-index: 2;
-    max-width: 600px;
+    margin-top: 6vh; /* Más arriba */
 }
 
-/* Imagen */
+/* FOTO */
 img {
-    width: 220px;
+    width: 240px;
     border-radius: 20px;
     margin-bottom: 25px;
-    box-shadow: 0 0 25px rgba(255,255,255,0.3);
+    box-shadow: 0 0 30px rgba(255,255,255,0.4);
 }
 
-/* Texto */
+/* TEXTO */
 h1 {
     font-size: 22px;
     font-weight: 300;
     line-height: 1.6;
+    max-width: 600px;
+    margin: auto;
 }
 
-/* Contador */
-#contador {
-    margin-top: 20px;
-    font-size: 18px;
-    opacity: 0.85;
-}
-
-/* Estrellas fondo */
+/* ESTRELLAS DE FONDO */
 .star {
     position: absolute;
     width: 2px;
     height: 2px;
     background: white;
     border-radius: 50%;
+    opacity: 0.8;
     animation: blink 2s infinite alternate;
 }
 
 @keyframes blink {
-    from { opacity: 0.3; }
+    from { opacity: 0.4; }
     to { opacity: 1; }
 }
 
-/* Estrella fugaz mejorada */
+/* ESTRELLA FUGAZ REAL */
 .shooting-star {
     position: absolute;
-    top: 20%;
-    left: -150px;
+    top: 15%;
+    left: -200px;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 15px white, 0 0 30px white;
+    animation: shoot 7s linear infinite;
+}
+
+.shooting-star::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: -120px;
     width: 120px;
-    height: 3px;
-    background: linear-gradient(90deg, white, rgba(255,255,255,0));
-    border-radius: 50px;
-    box-shadow: 0 0 15px white;
-    transform: rotate(25deg);
-    animation: shoot 6s linear infinite;
+    height: 2px;
+    background: linear-gradient(to right, rgba(255,255,255,0), white);
 }
 
 @keyframes shoot {
     0% {
-        transform: translateX(0) translateY(0) rotate(25deg);
+        transform: translate(0, 0);
         opacity: 1;
     }
-    70% {
+    90% {
         opacity: 1;
     }
     100% {
-        transform: translateX(120vw) translateY(40vh) rotate(25deg);
+        transform: translate(120vw, 50vh);
         opacity: 0;
     }
 }
@@ -99,23 +99,23 @@ h1 {
 <div class="shooting-star"></div>
 
 <div class="container">
+    <!-- IMPORTANTE: asegúrate que el archivo se llame EXACTAMENTE Val.jpg -->
     <img src="Val.jpg" alt="Val">
 
     <h1>
-        Han pasado <span id="tiempo"></span><br><br>
+        Han pasado <span id="contador"></span><br><br>
         Desde que han pasado tanto,<br>
         el tiempo tiene otro ritmo,<br>
         sin ruido, pero real,<br>
         y me gusta.<br><br>
         Quiero que todo siga siendo así.
     </h1>
-
-    <div id="contador"></div>
 </div>
 
 <script>
-// Fecha inicial (CAMBIA esta fecha por la tuya)
-const fechaInicio = new Date("2025-01-01T00:00:00");
+// ⚠️ CAMBIA ESTA FECHA POR LA REAL
+const fechaInicio = new Date(2025, 0, 1, 0, 0, 0); 
+// (Año, mes-1, día, hora, minuto, segundo)
 
 function actualizarContador() {
     const ahora = new Date();
@@ -126,16 +126,15 @@ function actualizarContador() {
     const minutos = Math.floor((diferencia / (1000 * 60)) % 60);
     const segundos = Math.floor((diferencia / 1000) % 60);
 
-    const texto = `${dias} días, ${horas} horas, ${minutos} minutos, ${segundos} segundos`;
-
-    document.getElementById("tiempo").innerText = texto;
+    document.getElementById("contador").innerText =
+        `${dias} días, ${horas} horas, ${minutos} minutos, ${segundos} segundos`;
 }
 
 setInterval(actualizarContador, 1000);
 actualizarContador();
 
-/* Generar estrellas fondo */
-for (let i = 0; i < 120; i++) {
+/* GENERAR ESTRELLAS */
+for (let i = 0; i < 150; i++) {
     const star = document.createElement("div");
     star.className = "star";
     star.style.top = Math.random() * 100 + "vh";
