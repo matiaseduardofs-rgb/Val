@@ -2,146 +2,221 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>✨</title>
 
 <style>
 body {
-    margin: 0;
-    background: radial-gradient(ellipse at bottom, #0b0f2a 0%, #000 100%);
-    overflow: hidden;
-    font-family: 'Segoe UI', sans-serif;
-    color: white;
-    text-align: center;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(ellipse at bottom, #0b132b 0%, #000000 100%);
+  overflow: hidden;
+  font-family: 'Georgia', serif;
+  color: white;
+  text-align: center;
 }
 
-/* CONTENEDOR */
-.container {
-    position: relative;
-    z-index: 2;
-    margin-top: 6vh; /* Más arriba */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  top: 14vh; /* ← antes era 20vh */
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.poem {
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.counter {
+  margin-top: 20px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  opacity: 0.9;
 }
 
 /* FOTO */
-img {
-    width: 240px;
-    border-radius: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 0 30px rgba(255,255,255,0.4);
+.photo {
+  margin-top: 30px;
+  width: 170px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 30px rgba(255,255,255,0.5);
+  animation: fadeIn 4s forwards;
+  animation-delay: 2s;
 }
 
-/* TEXTO */
-h1 {
-    font-size: 22px;
-    font-weight: 300;
-    line-height: 1.6;
-    max-width: 600px;
-    margin: auto;
+.reflection {
+  margin-top: 40px;
+  opacity: 0;
+  animation: fadeIn 4s forwards;
+  animation-delay: 4s;
 }
 
-/* ESTRELLAS DE FONDO */
-.star {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.8;
-    animation: blink 2s infinite alternate;
-}
-
-@keyframes blink {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
-}
-
-/* ESTRELLA FUGAZ REAL */
-.shooting-star {
-    position: absolute;
-    top: 15%;
-    left: -200px;
-    width: 4px;
-    height: 4px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 0 15px white, 0 0 30px white;
-    animation: shoot 7s linear infinite;
-}
-
-.shooting-star::after {
-    content: "";
-    position: absolute;
-    top: 1px;
-    left: -120px;
-    width: 120px;
-    height: 2px;
-    background: linear-gradient(to right, rgba(255,255,255,0), white);
-}
-
-@keyframes shoot {
-    0% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    90% {
-        opacity: 1;
-    }
-    100% {
-        transform: translate(120vw, 50vh);
-        opacity: 0;
-    }
+@keyframes fadeIn {
+  to { opacity: 1; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="shooting-star"></div>
+<canvas id="sky"></canvas>
 
-<div class="container">
-    <!-- IMPORTANTE: asegúrate que el archivo se llame EXACTAMENTE Val.jpg -->
-    <img src="Val.jpg" alt="Val">
+<div class="content">
 
-    <h1>
-        Han pasado <span id="contador"></span><br><br>
-        Desde que han pasado tanto,<br>
-        el tiempo tiene otro ritmo,<br>
-        sin ruido, pero real,<br>
-        y me gusta.<br><br>
-        Quiero que todo siga siendo así.
-    </h1>
+  <div class="poem">
+    Han pasado:
+  </div>
+
+  <div class="counter" id="counter"></div>
+
+  <img src="Val.jpg" class="photo">
+
+  <div class="poem reflection">
+    Desde entonces,<br>
+    el tiempo tiene otro ritmo.<br><br>
+    Sin ruido.<br>
+    Pero real.<br><br>
+    Y me gusta.<br><br>
+    Quiero que todo siga siendo así.
+  </div>
+
 </div>
 
 <script>
-// ⚠️ CAMBIA ESTA FECHA POR LA REAL
-const fechaInicio = new Date(2025, 0, 1, 0, 0, 0); 
-// (Año, mes-1, día, hora, minuto, segundo)
+const canvas = document.getElementById("sky");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-function actualizarContador() {
-    const ahora = new Date();
-    const diferencia = ahora - fechaInicio;
-
-    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-    const horas = Math.floor((diferencia / (1000 * 60 * 60)) % 24);
-    const minutos = Math.floor((diferencia / (1000 * 60)) % 60);
-    const segundos = Math.floor((diferencia / 1000) % 60);
-
-    document.getElementById("contador").innerText =
-        `${dias} días, ${horas} horas, ${minutos} minutos, ${segundos} segundos`;
+// ⭐ Estrellas
+let stars = [];
+for (let i = 0; i < 140; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 2 + 0.5,
+    alpha: Math.random(),
+    speed: Math.random() * 0.015
+  });
 }
 
-setInterval(actualizarContador, 1000);
-actualizarContador();
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-/* GENERAR ESTRELLAS */
-for (let i = 0; i < 150; i++) {
-    const star = document.createElement("div");
-    star.className = "star";
-    star.style.top = Math.random() * 100 + "vh";
-    star.style.left = Math.random() * 100 + "vw";
-    star.style.animationDuration = (1 + Math.random() * 2) + "s";
-    document.body.appendChild(star);
+  for (let star of stars) {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = "white";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    star.alpha += star.speed;
+    if (star.alpha <= 0.2 || star.alpha >= 1) {
+      star.speed = -star.speed;
+    }
+  }
+
+  drawShootingStar();
+  requestAnimationFrame(drawStars);
 }
+
+// 🌠 Estrella fugaz
+let shootingStar = null;
+
+function createShootingStar() {
+  shootingStar = {
+    x: Math.random() * canvas.width * 0.6,
+    y: Math.random() * canvas.height * 0.4,
+    vx: 8,
+    vy: 3,
+    size: 3,
+    life: 0,
+    maxLife: 40
+  };
+}
+
+function drawShootingStar() {
+  if (!shootingStar && Math.random() < 0.003) {
+    createShootingStar();
+  }
+
+  if (shootingStar) {
+
+    const gradient = ctx.createLinearGradient(
+      shootingStar.x,
+      shootingStar.y,
+      shootingStar.x - 80,
+      shootingStar.y - 30
+    );
+
+    gradient.addColorStop(0, "rgba(255,255,255,1)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(shootingStar.x, shootingStar.y);
+    ctx.lineTo(
+      shootingStar.x - 80,
+      shootingStar.y - 30
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(shootingStar.x, shootingStar.y, shootingStar.size, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "white";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    shootingStar.x += shootingStar.vx;
+    shootingStar.y += shootingStar.vy;
+    shootingStar.life++;
+
+    if (shootingStar.life > shootingStar.maxLife) {
+      shootingStar = null;
+    }
+  }
+}
+
+drawStars();
+
+// ⏳ Contador
+const startDate = new Date("2025-10-16T18:00:00");
+
+function updateCounter() {
+  const now = new Date();
+  const diff = now - startDate;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  document.getElementById("counter").innerHTML =
+    days + " días · " +
+    hours + " horas · " +
+    minutes + " minutos · " +
+    seconds + " segundos";
+}
+
+setInterval(updateCounter, 1000);
+updateCounter();
 </script>
 
 </body>
